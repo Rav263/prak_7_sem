@@ -1,4 +1,3 @@
-
 #include <stdio.h>
 #include <iostream>
 #include <wchar.h>
@@ -28,11 +27,48 @@ using namespace com::sun::star::registry;
 
 using ::rtl::OUString;
 using ::rtl::OUStringToOString;
+using ::rtl::OString;
 
-SAL_IMPLEMENT_MAIN_WITH_ARGS(argc, argv) {
-    OUString sConnectionString("uno:socket,host=localhost,port=2083;urp;StarOffice.ServiceManager");
+SAL_IMPLEMENT_MAIN() {
+    //OUString sConnectionString(
+    //        "uno:socket,host=localhost,port=2083;urp;StarOffice.ServiceManager");
+    try {
+        // get the remote office component context
+        Reference<XComponentContext> xContext(::cppu::bootstrap());
+        if (!xContext.is()) {
+            std::cout << std::endl << "Error getting context from running LO instance..." << std::endl;
+            return -1;
+        }
 
-    sal_Int32 nCount = (sal_Int32)rtl_getAppCommandArgCount();
+        // retrieve the service-manager from the context
+        Reference<XMultiComponentFactory> xServiceManager = xContext->getServiceManager();
+        if (xServiceManager.is())
+            std::cout << std::endl << "remote ServiceManager is available" << std::endl;
+        else {
+            std::cout << std::endl << "remote ServiceManager is not available" << std::endl;
+            return 0;
+        }
+        
+        Reference<XInterface> xDesktop = 
+            xServiceManager->createInstanceWithContext(OUString("com.sun.star.frame.Desktop"), xContext);
 
-    std::cout << nCount << std::endl;
+        Reference<XDesktop2> xDesktop2(xDesktop, UNO_QUERY);
+
+        Reference<XComponent> xComponent = 
+            xDesktop2->loadComponentFromURL(OUString("private:factory/swriter"), // URL to the ods file
+                                            OUString( "_blank" ), 0,
+                                            Sequence < ::com::sun::star::beans::PropertyValue >());
+        
+    }
+    catch (::cppu::BootstrapException& e) {
+        fprintf(stderr, "caught BootstrapException: %s\n",
+                OUStringToOString( e.getMessage(), RTL_TEXTENCODING_ASCII_US ).getStr());
+        return 1;
+    }
+    catch (Exception& e) {
+        fprintf(stderr, "caught UNO exception: %s\n",
+                OUStringToOString( e.Message, RTL_TEXTENCODING_ASCII_US ).getStr());
+        return 1;
+    }
+    return 0;
 }

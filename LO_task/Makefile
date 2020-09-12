@@ -34,7 +34,7 @@
 
 # Builds the C++ DocumentLoader example of the SDK.
 
-PRJ=../../..
+PRJ=../../../../
 SETTINGS=$(PRJ)/settings
 
 include $(SETTINGS)/settings.mk
