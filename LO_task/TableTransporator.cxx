@@ -22,6 +22,7 @@
 
 #include <com/sun/star/text/XTextTable.hpp>
 #include <com/sun/star/text/XTextContent.hpp>
+#include <com/sun/star/table/XCell.hpp>
 
 #include <string.h>
 
@@ -32,6 +33,7 @@ using namespace com::sun::star::bridge;
 using namespace com::sun::star::frame;
 using namespace com::sun::star::registry;
 using namespace com::sun::star::text;
+using namespace com::sun::star::table;
 
 using ::rtl::OUString;
 using ::rtl::OUStringToOString;
@@ -77,6 +79,26 @@ SAL_IMPLEMENT_MAIN() {
     
         Reference <XTextContent> xTextContent (xTable, UNO_QUERY);
         xText->insertTextContent(xTextRange, xTextContent, (unsigned char) 0);
+        
+        Reference <XPropertySet> xTableProps (xTable, UNO_QUERY);
+        for (int x = 0; x < 4; x++) {
+            for (int y = 0; y < 4; y++) {
+                std::string cell_name;
+                cell_name.push_back((char)(x+(int)'A'));
+                cell_name.append(std::to_string(y + 1)); 
+                std::cout << cell_name << " ";
+                Reference <XCell> xCell = xTable->getCellByName(OUString::createFromAscii(cell_name.data()));
+                
+                auto x_text_cursor = Reference<XText>(xCell, UNO_QUERY)->createTextCursor();
+                
+                std::string cell_value = "row_";
+                cell_value.append(std::to_string(x));
+                cell_value.append(" colm_");
+                cell_value.append(std::to_string(y));
+                std::cout << cell_value << std::endl;
+                x_text_cursor->setString(OUString::createFromAscii(cell_value.data()));
+            }
+        }
     }
     catch (::cppu::BootstrapException& e) {
         fprintf(stderr, "caught BootstrapException: %s\n",
