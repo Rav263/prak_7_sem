@@ -24,7 +24,9 @@
 #include <com/sun/star/text/XTextContent.hpp>
 #include <com/sun/star/table/XCell.hpp>
 
-#include <string.h>
+#include <string>
+#include <cstdlib>
+#include <ctime>
 
 using namespace com::sun::star::uno;
 using namespace com::sun::star::lang;
@@ -39,11 +41,46 @@ using ::rtl::OUString;
 using ::rtl::OUStringToOString;
 using ::rtl::OString;
 
+void fill_table(Reference <XTextTable> &table, int num_of_col, int num_of_row) {
+    for (int x = 0; x < num_of_col; x++) {
+        for (int y = 0; y < num_of_row; y++) {
+            std::string cell_name;
+            cell_name.push_back((char)(x+(int)'A'));
+            cell_name.append(std::to_string(y + 1)); 
+
+            auto cell = table->getCellByName(OUString::createFromAscii(cell_name.data()));
+            auto text_cursor = Reference<XText>(cell, UNO_QUERY)->createTextCursor();
+            
+            std::string cell_value = "row_";
+            cell_value.append(std::to_string(y));
+            cell_value.append(" colm_");
+            cell_value.append(std::to_string(x));
+            
+            text_cursor->setString(OUString::createFromAscii(cell_value.data()));
+        }
+    }
+}
+
+void create_table(Reference <XMultiServiceFactory> &document, Reference <XText> &text) {
+    int num_of_row = std::rand() % 7 + 3;
+    int num_of_col = std::rand() % 3 + 3;
+    
+    std::cout << num_of_col << " " << num_of_row << std::endl;
+
+    Reference <XTextTable> table(document->createInstance(OUString::createFromAscii("com.sun.star.text.TextTable")), UNO_QUERY);
+    table->initialize(num_of_row, num_of_col);
+    auto text_range = text->getEnd();
+
+    Reference <XTextContent> text_content(table, UNO_QUERY);
+    text->insertTextContent(text_range, text_content, (unsigned char) 0);
+
+    fill_table(table, num_of_col, num_of_row);
+}
+
+
 SAL_IMPLEMENT_MAIN() {
-    //OUString sConnectionString(
-    //        "uno:socket,host=localhost,port=2083;urp;StarOffice.ServiceManager");
+    std::srand(std::time(nullptr));
     try {
-        // get the remote office component context
         Reference<XComponentContext> xContext(::cppu::bootstrap());
         if (!xContext.is()) {
             std::cout << std::endl << "Error getting context from running LO instance..." << std::endl;
@@ -68,36 +105,23 @@ SAL_IMPLEMENT_MAIN() {
             xDesktop2->loadComponentFromURL(OUString("private:factory/swriter"), // URL to the ods file
                                             OUString( "_blank" ), 0,
                                             Sequence < ::com::sun::star::beans::PropertyValue >());
-        Reference <XTextDocument> xTextDocument(xComponent, UNO_QUERY);
-        Reference <XText> xText = xTextDocument->getText();
-        xText->setString(OUString::createFromAscii("Hello, world! This is my first table!"));
+        Reference <XTextDocument> text_document(xComponent, UNO_QUERY);
+        Reference <XText> text = text_document->getText();
+        text->setString(OUString::createFromAscii("Hello, world!"));
         
-        Reference <XMultiServiceFactory> oDocMSF(xTextDocument, UNO_QUERY);
-        Reference <XTextTable> xTable(oDocMSF->createInstance(OUString::createFromAscii("com.sun.star.text.TextTable")), UNO_QUERY);
-        xTable->initialize(4, 4);
-        auto xTextRange = xText->getEnd();
-    
-        Reference <XTextContent> xTextContent (xTable, UNO_QUERY);
-        xText->insertTextContent(xTextRange, xTextContent, (unsigned char) 0);
-        
-        Reference <XPropertySet> xTableProps (xTable, UNO_QUERY);
-        for (int x = 0; x < 4; x++) {
-            for (int y = 0; y < 4; y++) {
-                std::string cell_name;
-                cell_name.push_back((char)(x+(int)'A'));
-                cell_name.append(std::to_string(y + 1)); 
-                std::cout << cell_name << " ";
-                Reference <XCell> xCell = xTable->getCellByName(OUString::createFromAscii(cell_name.data()));
-                
-                auto x_text_cursor = Reference<XText>(xCell, UNO_QUERY)->createTextCursor();
-                
-                std::string cell_value = "row_";
-                cell_value.append(std::to_string(x));
-                cell_value.append(" colm_");
-                cell_value.append(std::to_string(y));
-                std::cout << cell_value << std::endl;
-                x_text_cursor->setString(OUString::createFromAscii(cell_value.data()));
-            }
+        Reference <XMultiServiceFactory> document(text_document, UNO_QUERY);
+
+        int num_of_tables = std::rand() % 7 + 2;
+
+        for (int i = 0; i < num_of_tables; i++) {
+            auto text_cursor = text->createTextCursor();
+            std::string table_name = "\nTable: ";
+            table_name.append(std::to_string(i));
+
+            std::cout << table_name << std::endl;
+            text_cursor->gotoEnd(false);
+            text_cursor->setString(OUString::createFromAscii(table_name.data()));
+            create_table(document, text);
         }
     }
     catch (::cppu::BootstrapException& e) {
