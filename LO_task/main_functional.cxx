@@ -64,11 +64,17 @@ void fill_table(Reference <XTextTable> &table, int num_of_col, int num_of_row) {
 }
 
 void fix_first_row(Reference<XTextTable> &table) {
-    auto table_rows = table->getRows();
-    Reference<XIndexAccess> rows(table_rows, UNO_QUERY);
-    Reference<XPropertySet> row_props(rows->getByIndex((short) 0), UNO_QUERY);
+    auto cell = table->getCellByName(OUString::createFromAscii("A1"));
+    Reference<XText> cell_text(cell, UNO_QUERY);
+    Reference<XTextRange> text_range(cell_text, UNO_QUERY);
+    Reference<XPropertySet> props(text_range, UNO_QUERY);
     
-    auto info = row_props->getPropertySetInfo();
+
+    //auto table_rows = table->getRows();
+    //Reference<XIndexAccess> rows(table_rows, UNO_QUERY);
+    //Reference<XPropertySet> row_props(rows->getByIndex((short) 0), UNO_QUERY);
+    
+    auto info = props->getPropertySetInfo();
     auto names = info->getProperties();
     auto size = names.getLength();
     std::cout << size << std::endl;
