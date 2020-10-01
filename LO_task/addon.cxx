@@ -1,16 +1,24 @@
-#include <addon.hxx>
 #include <com/sun/star/text/XTextDocument.hpp>
 #include <com/sun/star/beans/PropertyValue.hpp>
+
 #include <com/sun/star/frame/XFrame.hpp>
 #include <com/sun/star/frame/XController.hpp>
+
 #include <com/sun/star/awt/Toolkit.hpp>
 #include <com/sun/star/awt/XWindowPeer.hpp>
 #include <com/sun/star/awt/WindowAttribute.hpp>
 #include <com/sun/star/awt/XMessageBox.hpp>
+
 #include <com/sun/star/uno/XComponentContext.hpp>
-#include <cppuhelper/supportsservice.hxx>
 #include <com/sun/star/lang/XMultiServiceFactory.hpp>
+
 #include <rtl/ustring.hxx>
+#include <addon.hxx>
+#include <cppuhelper/supportsservice.hxx>
+
+#include <iostream>
+#include <cstdlib>
+#include <ctime>
 
 #include "main_functional.h"
 
@@ -26,6 +34,7 @@ using com::sun::star::util::URL;
 
 
 void SAL_CALL Addon::initialize(const Sequence<Any>& aArguments) throw (Exception, RuntimeException) {
+    srand(time(0));
     Reference <XFrame> xFrame;
     if (aArguments.getLength()) {
         aArguments[0] >>= xFrame;
@@ -42,9 +51,9 @@ Reference<XDispatch> SAL_CALL Addon::queryDispatch(
     sal_Int32 nSearchFlags) throw(RuntimeException) {
 
     Reference <XDispatch> xRet;
-    if (aURL.Protocol.equalsAscii("org.openoffice.Office.addon.example:")) {
-        if (aURL.Path.equalsAscii("Function1")) xRet = this;
-        else if (aURL.Path.equalsAscii("Function2")) xRet = this;
+    if (aURL.Protocol.equalsAscii("org.openoffice.Office.table.transpositor:")) {
+        if (aURL.Path.equalsAscii("Transpose")) xRet = this;
+        else if (aURL.Path.equalsAscii("NewDocument")) xRet = this;
         else if (aURL.Path.equalsAscii( "Help" )) xRet = this;
     }
 
@@ -53,12 +62,12 @@ Reference<XDispatch> SAL_CALL Addon::queryDispatch(
 
 
 void SAL_CALL Addon::dispatch(const URL& aURL, const Sequence <PropertyValue>& lArgs) throw (RuntimeException) {
-    if (aURL.Protocol.equalsAscii("org.openoffice.Office.addon.example:")) {
-        if (aURL.Path.equalsAscii("Function1")) {
+    if (aURL.Protocol.equalsAscii("org.openoffice.Office.table.transpositor:")) {
+        if (aURL.Path.equalsAscii("Transpose")) {
             Reference<XTextDocument> text_document(mxFrame->getController()->getModel(), UNO_QUERY);
             
             transposite_all_tables(text_document);
-        } else if (aURL.Path.equalsAscii("Function2")) {
+        } else if (aURL.Path.equalsAscii("NewDocument")) {
             create_new_document(mxContext);
         }
     }

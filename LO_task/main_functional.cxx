@@ -101,7 +101,7 @@ void create_table(Reference <XMultiServiceFactory> &document, Reference <XText> 
 
     Reference <XTextContent> text_content(table, UNO_QUERY);
     text->insertTextContent(text_range, text_content, (unsigned char) 0);
-    fix_first_row(table);
+//    fix_first_row(table);
 
     fill_table(table, num_of_col, num_of_row);
 }
@@ -120,7 +120,7 @@ void create_new_document(Reference<XComponentContext> xContext){
         
     Reference <XMultiServiceFactory> document(text_document, UNO_QUERY);
 
-    int num_of_tables = 1; //std::rand() % 7 + 2;
+    int num_of_tables = std::rand() % 7 + 2;
 
     for (int i = 0; i < num_of_tables; i++) {
         auto text_cursor = text->createTextCursor();
