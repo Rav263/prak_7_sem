@@ -11,4 +11,4 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O5 -fopenmp -mavx")
 
 include_directories(include)
 
-add_executable(IO src/main.cpp src/temperature.cpp)
+add_executable(IO src/main.cpp src/temperature.cpp src/problem.cpp src/solution.cpp)
