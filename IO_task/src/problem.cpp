@@ -20,3 +20,7 @@ uint32_t Problem::get_index() {
 uint32_t Problem::get_proc_index() {
     return this->proc_index;
 }
+
+Problem::~Problem() {
+    delete this->next_links;
+}
