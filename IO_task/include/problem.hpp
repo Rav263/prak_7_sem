@@ -21,6 +21,7 @@ public:
     std::vector<Problem *>* get_next_links();
     uint32_t get_index();
     uint32_t get_proc_index();
+    Problem *copy_problem();
     ~Problem();
 };
 

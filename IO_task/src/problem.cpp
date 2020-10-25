@@ -21,6 +21,12 @@ uint32_t Problem::get_proc_index() {
     return this->proc_index;
 }
 
+Problem *Problem::copy_problem() {
+    Problem *new_problem = new Problem(this->work_time, this->proc_index, this->index);
+    
+    return new_problem;
+}
+
 Problem::~Problem() {
     delete this->next_links;
 }
