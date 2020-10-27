@@ -9,6 +9,10 @@ private:
 public:
     IO(Solution *initial_solution) : now_solution(initial_solution){
     }
-}
+
+    void main_cycle();
+    Solution *get_best_solution();  
+    void evaluate_now_solution();
+};
 
 #endif //IO_HPP
