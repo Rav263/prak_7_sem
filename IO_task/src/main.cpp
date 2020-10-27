@@ -22,7 +22,6 @@ int main() {
     }
 
     Solution *solution = init_solution;
-    solution->get_problem(0)->add_next_link(solution->get_problem(1));
     
     std::cout << "INIT SOLUTION: " << std::endl;
     solution->print_solution();
