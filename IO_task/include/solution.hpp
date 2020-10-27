@@ -12,14 +12,18 @@ public:
     Solution() {
     }
 
-    virtual Solution* copy_solution(){
+    virtual Solution* copy_solution() {
         return nullptr;
     }
     
-    virtual void print_solution(){}
+    virtual void print_solution() {}
 
-    virtual Problem *get_problem(uint32_t index){
+    virtual Problem *get_problem(uint32_t index) {
         return nullptr;
+    }
+
+    virtual double evaluate() {
+        return 0.0;
     }
 
     ~Solution() {
@@ -45,5 +49,6 @@ public:
     virtual Problem *get_problem(uint32_t index);
     virtual Solution* copy_solution();
     virtual void print_solution();
+    virtual double evaluate();
 };
 #endif // SOLUTION_HPP

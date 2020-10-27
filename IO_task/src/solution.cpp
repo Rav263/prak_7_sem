@@ -54,4 +54,33 @@ void BigSolution::print_solution() {
         }
         std::cout << std::endl;
     }
+
+    std::cout << "EVALUATION: " << this->evaluate() << std::endl;
+}
+
+
+// Maybe it's needed to add start and end time for each problem
+// Becouse maybe i'll need calculate pauses in procs work.
+
+double BigSolution::evaluate() {
+    std::vector<double> times(this->num_procs);
+
+    for (auto now_problem : this->work_flow) {
+        uint32_t proc_index = now_problem->get_proc_index();
+        times[proc_index] += now_problem->get_work_time();
+    }
+
+    double min_time = times[0];
+    double max_time = times[0];
+
+    for (auto now_time : times) {
+        if (now_time < min_time) {
+            min_time = now_time;
+        }
+        if (now_time > max_time) {
+            max_time = now_time;
+        }
+    }
+
+    return max_time - min_time;
 }

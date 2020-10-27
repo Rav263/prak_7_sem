@@ -27,6 +27,10 @@ Problem *Problem::copy_problem() {
     return new_problem;
 }
 
+double Problem::get_work_time() {
+    return this->work_time;
+}
+
 Problem::~Problem() {
     delete this->next_links;
 }

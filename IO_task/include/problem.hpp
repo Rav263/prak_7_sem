@@ -16,6 +16,7 @@ public:
         this->next_links = new std::vector<Problem *>();
     }
 
+    double get_work_time();
     void add_next_link(Problem *problem);
     void change_proc_index(uint32_t new_index);
     std::vector<Problem *>* get_next_links();
