@@ -3,19 +3,22 @@
 
 #include <iostream>
 #include "solution.hpp"
+#include "temperature.hpp"
 
-
-class MutOperation {
+class MutableLaw {
 public:
-    Solution *solution;
-    MutOperation(Solution *solution) : solution(solution) {
+    MutableLaw() {
     }
+
+    virtual double mut_solution(Solution *solution, Temp * temp){return 0.0;}
 };
 
-class MyMutOperation : public MutOperation {
+class MutableLawOp : public MutableLaw {
 public:
-    MyMutOperation(Solution *solution) : MutOperation(solution) {
+    MutableLawOp() {
     }
-}
+
+    virtual double mut_solution(Solution *solution, Temp *temp);
+};
 
 #endif //MUTABLE_HPP
