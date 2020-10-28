@@ -20,7 +20,7 @@ Solution *create_init_solution(uint32_t num_of_problems, uint32_t num_of_procs) 
     double full_time = 0;
 
     for (uint32_t i = 0; i < num_of_problems; i++) {
-        problems.push_back(new Problem(2.0, 1, i));
+        problems.push_back(new Problem((1.0 / (double) (std::rand() % 20)) * 10, 0, i));
         full_time += problems[problems.size() - 1]->get_work_time();
     }
 
@@ -55,6 +55,10 @@ Solution *create_init_solution(uint32_t num_of_problems, uint32_t num_of_procs) 
         init_solution->add_new_problem(problems[index]);
     }
 
+    /*
+    for (auto now_problem : problems) {
+        init_solution->add_new_problem(now_problem);
+    }*/
     return init_solution;
 }
 
@@ -71,18 +75,21 @@ int main() {
 
     Solution *solution = create_init_solution(num_of_problems, num_of_procs);
     MutableLaw *mut = new MutableLawOp();
+    Temp *temp = new TempFirst(1000);
 
     std::cout << "INIT SOLUTION: " << std::endl;
     solution->print_solution();
     
-    IO *io = new IO(solution, mut, nullptr);
+    IO *io = new IO(solution, mut, temp);
 
     io->main_cycle();
     auto best_solution = io->get_best_solution();
 
     best_solution->print_solution();
+    std::cout << "ITERATIONS: " << io->get_iterations() << std::endl;
 
     delete solution;
     delete mut;
     delete io;
+    delete temp;
 }
