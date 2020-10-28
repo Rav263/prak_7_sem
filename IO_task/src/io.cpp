@@ -3,6 +3,7 @@
 void IO::main_cycle() {
     uint32_t best_count = 0;
     for(;;) {
+        this->iterations += 1;
         auto new_evaluation = this->mut_law->mut_solution(this->now_solution, this->temp_law);
         
         if (new_evaluation < this->best_solution->evaluate()) {
@@ -13,7 +14,7 @@ void IO::main_cycle() {
             best_count += 1;
         }
 
-        if (best_count == 10) {
+        if (best_count == 100) {
             break;
         }
     }
@@ -21,6 +22,10 @@ void IO::main_cycle() {
 
 Solution* IO::get_best_solution() {
     return this->best_solution;
+}
+
+uint64_t IO::get_iterations() {
+    return this->iterations;
 }
 
 IO::~IO() {

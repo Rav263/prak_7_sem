@@ -10,7 +10,7 @@ private:
     Solution *best_solution = nullptr;
     MutableLaw *mut_law = nullptr;
     Temp *temp_law = nullptr;
-    double best_metric;
+    uint64_t iterations = 0;
 public:
     IO(Solution *initial_solution, MutableLaw *mut, Temp *temp) :
         now_solution(initial_solution), mut_law(mut), temp_law(temp) {
@@ -19,7 +19,7 @@ public:
 
     void main_cycle();
     Solution *get_best_solution();
-
+    uint64_t get_iterations();
     ~IO();
 };
 
