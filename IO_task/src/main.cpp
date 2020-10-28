@@ -27,7 +27,7 @@ int main() {
     solution->print_solution();
     
     Solution *new_solution = solution->copy_solution();
-    new_solution->get_problem(1)->change_proc_index(2);
+    new_solution->change_problem_proc_index(1, 2);
     
     std::cout << std::endl << "AFTER CHANGE INIT SOLUTION" << std::endl;
     solution->print_solution();

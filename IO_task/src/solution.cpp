@@ -3,44 +3,38 @@
 #include "solution.hpp"
 
 
-uint32_t BigSolution::get_last_problem_index() {
-    return this->work_flow.size() - 1;
-}
-
 void BigSolution::add_new_problem(Problem *problem) {
-    if (this->num_procs < problem->get_proc_index()) {
-        std::cerr << "ERROR:: BAD PROBLEM PROC INDEX" << std::endl;
-        exit(1);
-    }
-    if (this->get_last_problem_index() != problem->get_index() - 1) {
-        std::cerr << "ERROR:: BAD PROBLEM INDEX" << std::endl;
-        exit(1);
-    }
-    this->work_flow.push_back(problem);
+    problems[problem->get_index()] = problem;
+    procs[problem->get_index()] = problem->get_proc_index();
 }
 
-Problem *BigSolution::get_problem(uint32_t index) {
-    return this->work_flow[index];
-}
 
 Solution *BigSolution::copy_solution() {
     BigSolution *new_solution = new BigSolution(this->num_procs, this->num_problems);
 
-    for (auto old_problem : this->work_flow) {
-        new_solution->add_new_problem(old_problem->copy_problem());
+    new_solution->procs = this->procs;
+    
+    for (auto old_problem : this->problems) {
+        new_solution->problems[old_problem->get_index()] = old_problem->copy_problem();
     }
 
     return new_solution;
 }
 
+
 void BigSolution::print_solution() {
-    for (auto now_problem : this->work_flow) {
+    for (auto now_problem : this->problems) {
         std::cout << "Problem: " << now_problem->get_index() 
             << " proc index: " << now_problem->get_proc_index() << std::endl;
-
     }
 
     std::cout << "EVALUATION: " << this->evaluate() << std::endl;
+}
+
+
+void BigSolution::change_problem_proc_index(uint32_t problem_index, uint32_t proc_index) {
+    problems[problem_index]->change_proc_index(proc_index);
+    procs[problem_index] = proc_index;
 }
 
 
@@ -50,9 +44,8 @@ void BigSolution::print_solution() {
 double BigSolution::evaluate() {
     std::vector<double> times(this->num_procs);
 
-    for (auto now_problem : this->work_flow) {
-        uint32_t proc_index = now_problem->get_proc_index();
-        times[proc_index] += now_problem->get_work_time();
+    for (auto now_problem : problems) {
+        times[now_problem->get_proc_index()] += now_problem->get_work_time();
     }
 
     double min_time = times[0];
