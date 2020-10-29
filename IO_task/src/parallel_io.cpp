@@ -14,7 +14,7 @@ void ParallelIO::create_problems(uint32_t num_problems, uint32_t num_procs,
         int32_t rasn = end_time - start_time - 1;
 
         double work_time = std::rand() % rasn + start_time;
-        work_time += (1000.0 / (double) (std::rand() % 1000 + 1));
+        work_time += ((double) (std::rand() % 1000 + 1)) / 1000.0 ;
         this->problems->push_back(new Problem(work_time, 0, i));
     }
 }
