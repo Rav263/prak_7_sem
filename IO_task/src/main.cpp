@@ -7,7 +7,7 @@
 #include "temperature.hpp"
 #include "parallel_io.hpp"
 #include "problem.hpp"
-
+#include "xml_parser.hpp"
 
 void help() {
     std::cout << "---------- this is help message ----------" << std::endl;
@@ -87,7 +87,9 @@ int main(int argc, char **argv) {
                     args["start_time"], args["end_time"]);
 
             auto problems = parallel_io->get_problems();
+            write_xml_file(*problems, args["num_of_problems"], args["num_of_procs"], args["start_time"], args["end_time"], file_name);
             delete parallel_io;
+            return 0;
             // Test generation
 
          } else if (args["generate"]) {
