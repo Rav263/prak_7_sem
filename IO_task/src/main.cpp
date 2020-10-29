@@ -24,7 +24,7 @@ Solution *create_init_solution(uint32_t num_of_problems, uint32_t num_of_procs) 
         full_time += problems[problems.size() - 1]->get_work_time();
     }
 
-    std::sort(problems.begin(), problems.end(), [](Problem* first, Problem *second){
+   /* std::sort(problems.begin(), problems.end(), [](Problem* first, Problem *second){
         return first->get_work_time() > second->get_work_time();
     });
 
@@ -53,12 +53,12 @@ Solution *create_init_solution(uint32_t num_of_problems, uint32_t num_of_procs) 
         problems[index]->change_proc_index(num_of_procs - 1);
         
         init_solution->add_new_problem(problems[index]);
-    }
+    }*/
 
-    /*
+    
     for (auto now_problem : problems) {
         init_solution->add_new_problem(now_problem);
-    }*/
+    }
     return init_solution;
 }
 
@@ -75,7 +75,7 @@ int main() {
 
     Solution *solution = create_init_solution(num_of_problems, num_of_procs);
     MutableLaw *mut = new MutableLawOp();
-    Temp *temp = new TempFirst(1000);
+    Temp *temp = new TempSecond(1000);
 
     std::cout << "INIT SOLUTION: " << std::endl;
     solution->print_solution();
