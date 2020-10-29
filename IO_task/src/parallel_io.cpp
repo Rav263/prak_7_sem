@@ -3,22 +3,31 @@
 
 #include "parallel_io.hpp"
 
+void ParallelIO::create_problems(uint32_t num_problems, uint32_t num_procs, 
+        uint32_t start_time, uint32_t end_time) {
+    if (this->problems != nullptr) {
+        return;
+    }
+    this->problems = new std::vector<Problem *>();
+    for (uint32_t i = 0; i < num_problems; i++) {
+        
+        int32_t rasn = end_time - start_time - 1;
+
+        double work_time = std::rand() % rasn + start_time;
+        work_time += (1000.0 / (double) (std::rand() % 1000 + 1));
+        this->problems->push_back(new Problem(work_time, 0, i));
+    }
+}
+
+
 Solution *ParallelIO::create_init_solution(uint32_t num_of_problems, uint32_t num_of_procs) {
     BigSolution *init_solution = new BigSolution(num_of_procs, num_of_problems);
    
     double full_time = 0;
-    std::vector<Problem *> problems;
+    std::vector<Problem *> problems = *this->problems;
     
-    if (this->problems == nullptr) {
-        for (uint32_t i = 0; i < num_of_problems; i++) {
-            problems.push_back(new Problem((1.0 / (double) (std::rand() % 1000 + 1)) * 3000, 0, i));
-            full_time += problems[problems.size() - 1]->get_work_time();
-        }
-    } else {
-        problems = *this->problems;
-        for (uint32_t i = 0; i < num_of_problems; i++) {
-            full_time += problems[i]->get_work_time();
-        }
+    for (uint32_t i = 0; i < num_of_problems; i++) {
+        full_time += problems[i]->get_work_time();
     }
 
     std::sort(problems.begin(), problems.end(), [](Problem* first, Problem *second){

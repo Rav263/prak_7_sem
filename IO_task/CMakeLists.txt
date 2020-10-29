@@ -11,4 +11,4 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fopenmp")
 
 include_directories(include)
 
-add_executable(IO src/main.cpp src/temperature.cpp src/problem.cpp src/solution.cpp src/mutable.cpp src/io.cpp)
+add_executable(IO src/main.cpp src/temperature.cpp src/problem.cpp src/solution.cpp src/mutable.cpp src/io.cpp src/parallel_io.cpp)

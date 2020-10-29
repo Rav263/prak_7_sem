@@ -32,7 +32,9 @@ public:
 
 
     template<class TempLaw>
-    void create_io_tasks(uint32_t num_problems, uint32_t num_procs) {
+    void create_io_tasks(uint32_t num_problems, uint32_t num_procs, 
+            uint32_t start_time, uint32_t end_time) {
+        this->create_problems(num_problems, num_procs, start_time, end_time);
         Solution *init_solution = this->create_init_solution(num_problems, num_procs);
         std::cout << "Init evaluation: " << init_solution->evaluate() << std::endl;
         for (uint32_t i = 0; i < this->num_procs; i++) {
@@ -44,7 +46,14 @@ public:
     }
 
     Solution *create_init_solution(uint32_t num_problems, uint32_t num_procs);
+    void create_problems(uint32_t num_problems, uint32_t num_procs, 
+            uint32_t start_time, uint32_t end_time);
     void main_cycle();
+    
+    std::vector<Problem *> *get_problems() {
+        return this->problems;
+    }
+
     Solution *get_best_solution();
 
     ~ParallelIO() {
