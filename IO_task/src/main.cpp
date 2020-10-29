@@ -1,95 +1,84 @@
 #include <iostream>
 #include <vector>
-#include <algorithm>
 #include <cstdlib>
 #include <ctime>
-#include <cmath>
-
+#include <map>
 
 #include "temperature.hpp"
-#include "solution.hpp"
-#include "mutable.hpp"
-#include "io.hpp"
+#include "parallel_io.hpp"
+#include "problem.hpp"
 
 
-
-Solution *create_init_solution(uint32_t num_of_problems, uint32_t num_of_procs) {
-    BigSolution *init_solution = new BigSolution(num_of_procs, num_of_problems);
-    std::vector<Problem *> problems;
-   
-    double full_time = 0;
-
-    for (uint32_t i = 0; i < num_of_problems; i++) {
-        problems.push_back(new Problem((1.0 / (double) (std::rand() % 20)) * 10, 0, i));
-        full_time += problems[problems.size() - 1]->get_work_time();
-    }
-
-   /* std::sort(problems.begin(), problems.end(), [](Problem* first, Problem *second){
-        return first->get_work_time() > second->get_work_time();
-    });
-
-    double for_proc_work_time = full_time / num_of_procs;
-
-    uint32_t an_time = std::floor(for_proc_work_time);
-    uint32_t index = 0;
-
-    for (uint32_t i = 0; i < num_of_procs; i++) {
-        double now_added_time = 0;
-        
-        while (now_added_time < an_time and index < num_of_problems) {
-            problems[index]->change_proc_index(i);
-            init_solution->add_new_problem(problems[index]);
-            now_added_time += problems[index]->get_work_time();
-            index++;
-        }
-        std::cout << now_added_time << " " << an_time << std::endl;
-    
-        if (index >= num_of_problems) {
-            break;
-        }
-    }
-
-    for (; index < num_of_problems; index++) {
-        problems[index]->change_proc_index(num_of_procs - 1);
-        
-        init_solution->add_new_problem(problems[index]);
-    }*/
-
-    
-    for (auto now_problem : problems) {
-        init_solution->add_new_problem(now_problem);
-    }
-    return init_solution;
+void help() {
+    std::cout << "---------- this is help message ----------" << std::endl;
+    std::cout << "--file [file_name]                        arg for set path to file with problem *.xml" << std::endl;
+    std::cout << "--self [num_of_procs] [num_of_problems]   this arg for self problem generation (instead of --file)" << std::endl;
+    std::cout << "--procs [NProc]                           Solve program on NProc threads (default 1)" << std::endl;
+    std::cout << "--help                                    print this message" << std::endl;
 }
 
 
-int main() {
-    uint32_t num_of_procs = 1, num_of_problems = 0;
+std::string process_args(int argc, char** argv, std::map<std::string, uint32_t> &args) {
+    std::string file_name = "";
 
-    std::cout << "Enter num of procs: ";
-    std::cin >> num_of_procs;
+    for (uint32_t i = 1; i < argc; i++) {
+        std::string now_arg(argv[i]);
+         
+        if (now_arg == "--procs") {
+            if (i + 1 == argc) {
+                help();
+                exit(0);
+            }
+            std::string value(argv[i + 1]);
+            args["procs"] = std::stoi(value);
+        } else if (now_arg == "--self") {
+            std::string procs = argv[i + 1];
+            if (i + 1 == argc) {
+                help();
+                exit(0);
+            }
+            std::string problems(argv[i + 2]);
+            args["num_of_problems"] = std::stoi(problems);
+            args["num_of_procs"] = std::stoi(procs);
+        } else if (now_arg == "--file") {
+            if (i + 1 == argc) {
+                help();
+                exit(0);
+            }
 
-    std::cout << "Enter num of problems: ";
-    std::cin >> num_of_problems;
+            file_name = std::string(argv[i + 1]);
+        } else if (now_arg == "--help") {
+            help();
+            exit(0);
+        }
+    }
+
+    return file_name;
+}
 
 
-    Solution *solution = create_init_solution(num_of_problems, num_of_procs);
-    MutableLaw *mut = new MutableLawOp();
-    Temp *temp = new TempSecond(1000);
-
-    std::cout << "INIT SOLUTION: " << std::endl;
-    solution->print_solution();
+int main(int argc, char **argv) {
+    std::map<std::string, uint32_t> args;
+    std::string file_name = process_args(argc, argv, args);
     
-    IO *io = new IO(solution, mut, temp);
+    ParallelIO *parallel_io; 
+    
+    if (file_name.size() == 0 and args.count("num_of_problems") != 0) {
+        parallel_io = new ParallelIO(args["procs"]);
+    } else if (file_name.size() != 0) {
+         
+    } else {
+        std::cerr << "BAD ARGS -- NO TASK" << std::endl;
+        help();
+        return 0;
+    }
 
-    io->main_cycle();
-    auto best_solution = io->get_best_solution();
+    parallel_io->create_io_tasks<TempFirst>(args["num_of_problems"], args["num_of_procs"]);
+    parallel_io->main_cycle();
 
-    best_solution->print_solution();
-    std::cout << "ITERATIONS: " << io->get_iterations() << std::endl;
+    auto best_solution = parallel_io->get_best_solution();
+    std::cout << "End evaluation: " << best_solution->evaluate() << std::endl;
 
-    delete solution;
-    delete mut;
-    delete io;
-    delete temp;
+    delete parallel_io;
+    delete best_solution;
 }

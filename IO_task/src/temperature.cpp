@@ -8,10 +8,9 @@ void TempFirst::decrease_temp(uint32_t iteration) {
 }
 
 void TempSecond::decrease_temp(uint32_t iteration) {
-    this->temp = this->init_temp / log(1.0 + iteration);
-
+    this->temp = this->init_temp / std::log(1.0 + iteration);
 }
 
 void TempThird::decrease_temp(uint32_t iteration) {
-    this->temp = this->init_temp * log(1.0 + iteration) / (1.0 + iteration);
+    this->temp = (this->init_temp * std::log(1.0 + iteration)) / (1.0 + iteration);
 }

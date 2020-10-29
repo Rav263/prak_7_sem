@@ -1,5 +1,14 @@
 #include "io.hpp"
 
+
+void IO::update_best_solution(Solution *new_best_solution) {
+    delete this->now_solution;
+    delete this->best_solution;
+
+    this->now_solution = new_best_solution->copy_solution();
+    this->best_solution = new_best_solution;
+}
+
 void IO::main_cycle() {
     uint32_t best_count = 0;
     for(;;) {
@@ -7,16 +16,21 @@ void IO::main_cycle() {
         if (this->temp_law->temp <= 0.00000001) {
             break;
         }
-        auto new_evaluation = this->mut_law->mut_solution(this->now_solution, this->temp_law);
+        for (uint32_t i = 0; i < 10; i++) {
+            auto new_evaluation = this->mut_law->mut_solution(this->now_solution, this->temp_law);
         
-        if (new_evaluation < this->best_solution->evaluate()) {
-            delete this->best_solution;
-            this->best_solution = this->now_solution->copy_solution();
-            best_count = 0;
-        } else {
-            best_count += 1;
-        }
+            if (new_evaluation < this->best_solution->evaluate()) {
+                delete this->best_solution;
+                this->best_solution = this->now_solution->copy_solution();
+                best_count = 0;
+            } else {
+                best_count += 1;
+            }
 
+            if (best_count == 100) {
+                break;
+            }
+        }
         if (best_count == 100) {
             break;
         }
@@ -34,4 +48,6 @@ uint64_t IO::get_iterations() {
 
 IO::~IO() {
     delete best_solution;
+    delete temp_law;
+    delete now_solution;
 }

@@ -27,7 +27,6 @@ double MutableLawOp::mut_solution(Solution *solution, Temp *temp) {
     } else {
         double prob = std::exp(-(new_evaluation - old_evaluation) / temp->temp);
         double an_prob =  (double) (std::rand() % 1000) / 1000.0;
-        std::cout << prob << " " << an_prob << std::endl;
 
         if (an_prob > prob) {
             solution->change_problem_proc_index(problem_index, now_proc_index);
