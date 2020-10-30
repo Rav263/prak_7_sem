@@ -60,7 +60,7 @@
             \begin{tikzpicture}
             \begin{axis}[
                 width=0.8\textwidth,
-                height=0.8\textwidth,
+                height=0.6\textwidth,
                 ylabel={Время, секунды},
                 xlabel={Количество задач, шт},
                 y label style={at={(-0.05, 0.5)}},
@@ -81,9 +81,11 @@
             \end{tikzpicture}
                 \captionsetup{justification=centering}
                 \caption{Зависимость времени исполнения от количества задач}
-                \label{graph:btmem}
+                \label{graph:root_point}
             \end{figure}
-   
+            
+            Таким образом на графике~\ref{graph:root_point} мы видим, что алгоритм ведёт себя одинаково в рамках погрешности при изменении закона понижения температуры. 
+            Также мы видим, что для всех законов время выполнения заходит за минуту только на 40000 задач. Соответственно в дальнейшем я буду использовать именно это количество.
             %\begin{figure}[!htbp]
             %    \centering
             %\begin{tikzpicture}
@@ -110,6 +112,63 @@
             %    \caption{Dependence of memory from number of rules.}
             %    \label{graph:btmem}
             %\end{figure}
+        \subsection{Зависимость изменений в поведении алгоритма от количества потоков}
+            Во второй части экспериментального исследования необходимо было исследовать изменения поведения алгоритма при изменении количество потоков.
+            В данной части будет использован тестовый файл $test/procs/40000\_10.xml$, и закон понижения температуры Коши.
+           \begin{figure}[!htbp]
+               \centering
+           \begin{tikzpicture}
+           \begin{axis}[
+               width=0.8\textwidth,
+               height=0.6\textwidth,
+               ylabel={Лучшая оценка, попугаи},
+               xlabel={Количество процессоров, шт},
+               y label style={at={(-0.05, 0.5)}},
+               ymin=8, ymax=13,
+               xmin=0, xmax=18,
+               ytick={8, 8.5, 9, 9.5, 10, 10.5, 11, 11.5, 12, 12.5},
+               xtick={0, 2, 4, 6, 8, 10, 12, 14, 16, 18},
+               legend pos=south east,
+               ymajorgrids=true,
+               grid style=dashed,
+               cycle list name=color list] 
+           \addplot+[mark=square] coordinates{(1, 12.285)(2, 10.781)(4, 10.154)(6, 11.116)(8, 10.226)(10, 10.098)(12, 9.746)(14, 10.021)(16, 9.900)};
+           \legend{40000 задач; 10 процессеров}
+           
+           \end{axis}
+           \end{tikzpicture}
+               \captionsetup{justification=centering}
+               \caption{Зависимость оценки лучшего решения от количества процессов.}
+               \label{graph:all_popugs}
+           \end{figure}
+           \begin{figure}[!htbp]
+               \centering
+           \begin{tikzpicture}
+           \begin{axis}[
+               width=0.8\textwidth,
+               height=0.6\textwidth,
+               ylabel={Время выполнения, секунды},
+               xlabel={Количество процессоров, шт},
+               y label style={at={(-0.05, 0.5)}},
+               ymin=60, ymax=250,
+               xmin=0, xmax=18,
+               ytick={60, 80, 100, 120, 140, 160, 180, 200, 220, 240},
+               xtick={0, 2, 4, 6, 8, 10, 12, 14, 16, 18},
+               legend pos=south east,
+               ymajorgrids=true,
+               grid style=dashed,
+               cycle list name=color list] 
+           \addplot+[mark=square] coordinates{(1, 66.902)(2, 68.688)(4, 68.013)(6, 75.737)(8, 86.970)(10, 121.181)(12, 152.793)(14, 198.684)(16, 243.330)}; 
+           \legend{40000 задач; 10 процессеров}
+           
+           \end{axis}
+           \end{tikzpicture}
+               \captionsetup{justification=centering}
+               \caption{Зависимость времени выполнения от количества процессов}
+               \label{graph:all_time}
+           \end{figure}
+            Как можно видеть по графикам ~\ref{graph:all_popugs} и ~\ref{graph:all_time}, при увеличении количества процессов до 4-х время работы алгоритма не увеличивается,
+            А точность алгоритма улучшается в переходе от одного процесса на два на $20\%$. Дальнейшее улучшение производительности не было значительным, а прирост времени исполнения сильным.
 
     \section{Послесловие}
         В папке $tests/root\_point$ находится файл $50000\_100.xml$, если запустить программу вместе с сидом равным $1604022559$, то при использовании оптимизированного начального решения,
