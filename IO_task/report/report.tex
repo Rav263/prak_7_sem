@@ -1,0 +1,124 @@
+\documentclass[a4peper, 12pt, titlepage, finall]{extreport}
+
+%различные пакеты
+
+\usepackage[T1, T2A]{fontenc}
+\usepackage[russian]{babel}
+\usepackage[justification=centering]{caption}
+\usepackage[backend=bibtex]{biblatex}
+\usepackage{csquotes}
+\usepackage{tikz}
+\usepackage{geometry}
+\usepackage{indentfirst}
+\usepackage{fontspec}
+\usepackage{graphicx}
+\usepackage{array}
+\usepackage{pgfplots}
+\graphicspath{{./images/}}
+
+\usetikzlibrary{positioning, arrows}
+
+\geometry{a4paper, left = 15mm, top = 10mm, bottom = 15mm, right = 15mm}
+\setmainfont{Spectral Light}%{Times New Roman}
+\setcounter{secnumdepth}{0}
+%\setcounter{tocdepth}{3}
+\nocite{*}
+\begin{document}
+\begin{center}
+    {\large \bf Экспериментальное исследование разработанного алгоритма имитации отжига в рамках второго задания по курсу 
+    «Прaктикум на ЭВМ.»}
+
+\end{center}
+        \begin{flushright}
+            {Никифоров Никита Игоревич, 421 группа}\\
+        \end{flushright}
+    \section{Введение}
+        Необходимо было разработать алгоритм имитации отжига в применении к задаче построения распределённого рассписания. 
+        В моём варианте необходимо было реализовать критерий К3, а именно разбалансированность расписания 
+        (т.е. значение разности Tmax$-$Tmin, где Tmax $-$ наибольшая, по всем процессорам, длительность расписания на процессоре; Tmin $-$ аналогично, наименьшая длительность).
+        Также необходимо было реализовать многопоточный алготм имитации отжига с синхронизацией через разделяемую память.
+    
+    \section{Методика экспериментального исследования}
+        Все тестовые данные используемые в данном экспериментальном исследовании доступны в папке tests проекта. 
+        Так как алгоритм является недетерменированным бралась средняя оценка по критерию среди 10 прогонов. 
+        Время выполнения фиксировалось утилитой c с помощью библиотеки $std::chrono$.
+        Исследование проводилось без запущенных посторонних программ.
+    
+    \section{Тестовый стенд}
+        \begin{itemize}
+            \item Процессор $-$ AMD Ryzen 2700X 8/16 (ядер/потоков) 4.2 Ghz на одно ядро, 4.0 Ghz на все ядра.
+            \item Память $-$ 32Gb DDDR4 3200Mhz (Пропускная способность 44GB/s).
+        \end{itemize}
+
+    \section{Экспериментальное исследование}
+        \subsection{Поиск опорной точки}
+            Необходимо найти опорную точку экспериментального исследования, а именно вычислить количество задач и процессоров, такое, что время выполения на одном потоке будет
+            больше 1 минуты при использовании какого либо закона понижения температуры.
+            
+            \begin{figure}[!htbp]
+                \centering
+            \begin{tikzpicture}
+            \begin{axis}[
+                width=0.8\textwidth,
+                height=0.8\textwidth,
+                ylabel={Время, секунды},
+                xlabel={Количество задач, шт},
+                y label style={at={(-0.05, 0.5)}},
+                ymin=0, ymax=100,
+                xmin=0, xmax=40000,
+                xtick={0, 100, 1000, 5000, 10000, 15000, 20000, 25000, 30000, 35000, 40000},
+                ytick={0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90},
+                legend pos=south east,
+                ymajorgrids=true,
+                grid style=dashed,
+                cycle list name=color list] 
+                \addplot+[mark=square] coordinates{(100, 0.124)(1000, 0.845)(5000, 1.240)(10000, 4.153)(15000, 9.32)(20000, 16.068)(25000, 24.837)(30000, 36.072)(35000, 49.366)(40000, 71.032)};
+                \addplot+[mark=square] coordinates{(100, 0.005)(1000, 0.095)(5000, 1.418)(10000, 4.774)(15000, 11.045)(20000, 20.359)(25000, 32.257)(30000, 45.22)(35000, 55.929)(40000, 73.896)};
+                \addplot+[mark=square] coordinates{(100, 0.004)(1000, 0.070)(5000, 1.208)(10000, 4.213)(15000, 9.270)(20000, 15.746)(25000, 27.844)(30000, 35.656)(35000, 52.656)(40000, 68.522)};
+                \legend{Коши, Больцмана, смешанный закон}
+     
+            \end{axis}
+            \end{tikzpicture}
+                \captionsetup{justification=centering}
+                \caption{Зависимость времени исполнения от количества задач}
+                \label{graph:btmem}
+            \end{figure}
+   
+            %\begin{figure}[!htbp]
+            %    \centering
+            %\begin{tikzpicture}
+            %\begin{axis}[
+            %    width=0.4\textwidth,
+            %    height=0.4\textwidth,
+            %    ylabel={Лучшая оценка, попугаи},
+            %    xlabel={Количество задач, шт},
+            %    y label style={at={(-0.05, 0.5)}},
+            %    ymin=0, ymax=100,
+            %    xmin=0, xmax=64000,
+            %    xtick={0, 100, 1000, 5000, 10000, 15000, 20000, 25000, 30000, 35000, 40000},
+            %    ytick={0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90},
+            %    legend pos=south east,
+            %    ymajorgrids=true,
+            %    grid style=dashed,
+            %    cycle list name=color list] 
+            %    \addplot+[mark=square] coordinates{(100, )(1000, )(5000, )(10000, )(15000, )(20000, )(25000, )(30000, )(35000, )(40000, )};
+            %\legend{}
+            %
+            %\end{axis}
+            %\end{tikzpicture}
+            %    \captionsetup{justification=centering}
+            %    \caption{Dependence of memory from number of rules.}
+            %    \label{graph:btmem}
+            %\end{figure}
+
+    \section{Послесловие}
+        В папке $tests/root\_point$ находится файл $50000\_100.xml$, если запустить программу вместе с сидом равным $1604022559$, то при использовании оптимизированного начального решения,
+        алгоритм не сходится. А именно после завершения \"Параллельного\" $Nproc = 1$ алгоритма имитации отжига, оценка лучшего найденного решения равна оценке исходного $3196.39$.
+        При этом алгоритм работает меньше секунды.
+        Если же задать \"прямое\" начальное решение, а именно, когда все задачи находятся на одном процессоре алгоритм имитации отжига работает более 2-х минут, и находит оптимальное решение
+        оценка которого равна $51.69$.
+
+        В данном случае мы наблюдаем стандартный вариант нахождения локального минимума.
+
+
+\end{document}
