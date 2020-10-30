@@ -26,7 +26,7 @@ Solution *ParallelIO::create_init_solution(uint32_t num_of_problems, uint32_t nu
     double full_time = 0;
     std::vector<Problem *> problems = *this->problems;
     
-    for (uint32_t i = 0; i < num_of_problems; i++) {
+    /*for (uint32_t i = 0; i < num_of_problems; i++) {
         full_time += problems[i]->get_work_time();
     }
 
@@ -58,16 +58,16 @@ Solution *ParallelIO::create_init_solution(uint32_t num_of_problems, uint32_t nu
         problems[index]->change_proc_index(num_of_procs - 1);
         
         init_solution->add_new_problem(problems[index]);
-    }
-    
-    /*for (auto now_problem : problems) {
-        init_solution->add_new_problem(now_problem);
     }*/
+    
+    for (auto now_problem : problems) {
+        init_solution->add_new_problem(now_problem);
+    }
     return init_solution;
 }
 
 void ParallelIO::main_cycle() {
-    uint32_t best_count = 0;
+    int32_t best_count = 0;
     for (;;) {
         std::vector<std::thread> threads(this->io_tasks.size());
         for (uint32_t i = 0; i < threads.size(); i++) {
@@ -93,8 +93,7 @@ void ParallelIO::main_cycle() {
         for (auto now_io : this->io_tasks) {
             now_io->update_best_solution(this->best_solution->copy_solution());
         }
-
-        if (best_count == 10) {
+        if (best_count >= 10) {
             break;
         }
     }

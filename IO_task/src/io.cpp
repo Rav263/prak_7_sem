@@ -14,6 +14,7 @@ void IO::main_cycle() {
     for(;;) {
         this->temp_law->decrease_temp(this->iterations);
         if (this->temp_law->temp <= 0.00000001) {
+            std::cout << "TEMP BREAK" << std::endl;
             break;
         }
         for (uint32_t i = 0; i < 10; i++) {
@@ -27,11 +28,11 @@ void IO::main_cycle() {
                 best_count += 1;
             }
 
-            if (best_count == 100) {
+            if (best_count >= 100) {
                 break;
             }
         }
-        if (best_count == 100) {
+        if (best_count >= 100) {
             break;
         }
         this->iterations += 1;
