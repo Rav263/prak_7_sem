@@ -1,13 +1,15 @@
 import subprocess
-
+from tqdm import tqdm
 
 path = "../tests/procs/40000_10.xml"
 evaluation = [0.0 for x in range(16)]
 time = [0.0 for x in range(16)]
-iterations = 20
+iterations = 10
 
-for i in range(1, 17):
-    for it in range(iterations):
+procs = [1, 2, 4, 6, 8, 10, 12, 14, 16]
+
+for i in tqdm(procs):
+    for it in tqdm(range(iterations)):
         command = ["../build/IO", "--file", path, "--temp", "1", "--procs", str(i)]
         print(" ".join(command))
         proc = subprocess.Popen(command, stdout=subprocess.PIPE);
