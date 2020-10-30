@@ -72,6 +72,7 @@ std::string process_args(int argc, char** argv, std::map<std::string, uint32_t> 
 
 
 int main(int argc, char **argv) {
+    std::srand(time(0));
     std::map<std::string, uint32_t> args;
     std::string file_name = process_args(argc, argv, args);
     
@@ -81,7 +82,7 @@ int main(int argc, char **argv) {
         parallel_io = new ParallelIO(args["procs"]);
     
     } else if (file_name.size() != 0) {
-         if (args["generate"] and args.count("num_of_problems") != 0) {
+        if (args["generate"] and args.count("num_of_problems") != 0) {
             parallel_io = new ParallelIO(args["procs"]);
             parallel_io->create_problems(args["num_of_problems"], args["num_of_procs"], 
                     args["start_time"], args["end_time"]);
@@ -92,15 +93,26 @@ int main(int argc, char **argv) {
             return 0;
             // Test generation
 
-         } else if (args["generate"]) {
+        } else if (args["generate"]) {
             std::cerr << "BAD ARGS -- NO TASK" << std::endl;
             help();
             return 0;
          
-         } else {
-            // Task from file
-         }
-   
+        } else {
+            std::vector<Problem *> *problems = new std::vector<Problem *>();
+            uint32_t num_problems = 0;
+            uint32_t num_procs = 0;
+            uint32_t start_time = 0;
+            uint32_t end_time =0;
+
+            read_xml_file(*problems, num_problems, num_procs, start_time, end_time, file_name);
+            args["num_of_problems"] = num_problems;
+            args["num_of_procs"] = num_procs;
+            args["start_time"] = start_time;
+            args["end_time"] = end_time;
+            
+            parallel_io = new ParallelIO(args["procs"], 1000.0, problems);
+         } 
     } else {
         std::cerr << "BAD ARGS -- NO TASK" << std::endl;
         help();

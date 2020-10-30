@@ -59,7 +59,6 @@ Solution *ParallelIO::create_init_solution(uint32_t num_of_problems, uint32_t nu
         
         init_solution->add_new_problem(problems[index]);
     }
-
     
     /*for (auto now_problem : problems) {
         init_solution->add_new_problem(now_problem);
