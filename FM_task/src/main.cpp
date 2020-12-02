@@ -18,7 +18,8 @@ int main() {
     for (const auto ptr : cont) {
         std::cout << ptr->ToString() << " for x = 10 is " << (*ptr)(10) << std::endl;
     }
-    auto p = g / f + f;
+    auto p = g + f;
+    std::cout << p->GetDeriv(1) << " " << f->GetDeriv(3) << std::endl;
     //auto fuck_you = "wedw" + f;
     std::cout << (*p)(10) << std::endl;
 }

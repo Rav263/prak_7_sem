@@ -11,6 +11,7 @@ public:
     virtual double operator()(double x) = 0;
     virtual std::string ToString() = 0;
     virtual std::shared_ptr<TFunction> copy() = 0;
+    virtual double GetDeriv(double point) = 0;
 };
 
 class CompFunction : public TFunction{
@@ -18,7 +19,7 @@ class CompFunction : public TFunction{
     std::string operator_name;
 public:
     CompFunction(std::vector<std::shared_ptr<TFunction>> functions, std::string name);
-    double GetDeriv(int iterations);
+    double GetDeriv(double point);
     double operator()(double x);
     std::string ToString();
     std::shared_ptr<TFunction> copy();
@@ -32,6 +33,7 @@ public:
     double operator()(double x);
     std::string ToString();
     std::shared_ptr<TFunction> copy();
+    double GetDeriv(double point);
 };
 
 // Identical a*x + b;
@@ -43,6 +45,7 @@ public:
     double operator()(double x);
     std::string ToString();
     std::shared_ptr<TFunction> copy();
+    double GetDeriv(double point);
 };
 
 // Power x^a;
@@ -53,6 +56,7 @@ public:
     double operator()(double x);
     std::string ToString();
     std::shared_ptr<TFunction> copy();
+    double GetDeriv(double point);
 };
 
 // Exponent a^x
@@ -63,6 +67,7 @@ public:
     double operator()(double x);
     std::string ToString();
     std::shared_ptr<TFunction> copy();
+    double GetDeriv(double point);
 };
 
 //Polynomial a0*x^n + a1*x^n-1 + ... an
@@ -73,6 +78,7 @@ public:
     double operator()(double x);
     std::string ToString();
     std::shared_ptr<TFunction> copy();
+    double GetDeriv(double point);
 };
 
 #endif // MATH_LIB_HPP

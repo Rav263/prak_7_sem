@@ -8,8 +8,43 @@ CompFunction::CompFunction(std::vector<std::shared_ptr<TFunction>> functions, st
     this->operator_name = name;
 }
 
-double CompFunction::GetDeriv(int iterations) {
-    return 1;
+double CompFunction::GetDeriv(double point) {
+    std::vector<double> derivs;
+    for (auto func : this->functions) {
+        derivs.push_back(func->GetDeriv(point));
+    }
+
+    double result = 0;
+
+    if (this->operator_name == "+") {
+        for (auto now : derivs) result += now;
+        return result;
+    }
+    if (this->operator_name == "-") {
+        for (auto now : derivs) result -= now;
+        return result;
+    }
+
+    std::vector<double> results;
+    for (auto func : this->functions) {
+        results.push_back((*func)(point));
+    }
+
+
+    if (this->operator_name == "*") {
+        result += derivs[0] * results[1];
+        result += derivs[1] * results[0];
+        return result;
+    }
+
+    if (this->operator_name == "/") {
+        result += derivs[0] * results[1];
+        result -= derivs[1] * results[0]; 
+
+        result /= results[1] * results[1];
+
+        return result;
+    }
 }
 
 double CompFunction::operator()(double x) {
@@ -70,6 +105,10 @@ std::shared_ptr<TFunction> Constant::copy() {
     return std::make_shared<Constant>(std::vector<double>{this->coef});
 }
 
+double Constant::GetDeriv(double point) {
+    return this->coef;
+}
+
 // Power class declaration
 Power::Power(const std::vector<double> &coefs) {
     if (coefs.size() != 1) {
@@ -84,6 +123,10 @@ std::string Power::ToString() {return "x^" + std::to_string(this->a);}
 
 std::shared_ptr<TFunction> Power::copy() {
     return std::make_shared<Power>(std::vector<double>{this->a});
+}
+
+double Power::GetDeriv(double point) {
+    return this->a * std::pow(point, this->a - 1);
 }
 
 // Identical class declaration
@@ -105,6 +148,9 @@ std::shared_ptr<TFunction> Identical::copy() {
     return std::make_shared<Identical>(std::vector<double>{this->a, this->b});
 }
 
+double Identical::GetDeriv(double point) {
+    return this->a;
+}
 // Exponent class declaration
 Exponent::Exponent(const std::vector<double> &coefs) {
     if (coefs.size() != 1) {
@@ -121,6 +167,10 @@ std::string Exponent::ToString() {
 
 std::shared_ptr<TFunction> Exponent::copy() {
     return std::make_shared<Exponent>(std::vector<double>{this->a});
+}
+
+double Exponent::GetDeriv(double point) {
+    return std::pow(this->a, point) * std::log(a);
 }
 
 // Polynomial class declaration
@@ -154,3 +204,13 @@ std::shared_ptr<TFunction> Polynomial::copy() {
     return std::make_shared<Polynomial>(this->coefs);
 }
 
+double Polynomial::GetDeriv(double point) {
+    double result = 0;
+    
+    for (int i = 1; i < this->coefs.size(); i++) {
+        result += coefs[i] * std::pow(point, i - 1) * i;
+    }
+    return result;
+
+
+}
