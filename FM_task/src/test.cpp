@@ -5,6 +5,7 @@
 //#include "mathlibrary.hpp"
 #include <gtest/gtest.h>
 #include <typeinfo>
+#include <cmath>
 
 class TestFunFactory: public ::testing::Test
 {
@@ -243,15 +244,114 @@ TEST(ArithmeticOperations, TestDivision){
     }
 }
 
-TEST(ErrorTests, TestErrors) {
+TEST(ErrorTests, TestOperationsErrors) {
     FunFactory fact;
     auto fun = fact.CreateFunction("exp", {2});
     ASSERT_THROW(fun + "wqwd", std::logic_error);
     ASSERT_THROW("wqwd" + fun, std::logic_error);
-    auto some = fun + 1;
+    ASSERT_THROW(fun + 1, std::logic_error);
+    ASSERT_THROW(2.2 + fun, std::logic_error);
+    ASSERT_THROW(2.3 - fun, std::logic_error);
+    ASSERT_THROW(fun - 2, std::logic_error);
+    ASSERT_THROW("wwew" - fun, std::logic_error);
+    ASSERT_THROW(fun - "qweq", std::logic_error);
+    ASSERT_THROW(fun * "wqwd", std::logic_error);
+    ASSERT_THROW("wqwd" * fun, std::logic_error);
+    ASSERT_THROW(fun * 1, std::logic_error);
+    ASSERT_THROW(2.2 * fun, std::logic_error);
+    ASSERT_THROW(fun / "wqwd", std::logic_error);
+    ASSERT_THROW("wqwd" / fun, std::logic_error);
+    ASSERT_THROW(fun / 1, std::logic_error);
+    ASSERT_THROW(2.2 / fun, std::logic_error);
 }
 
+TEST(ErrorTests, TestCreationErrors) {
+    FunFactory fact;
+    ASSERT_THROW(fact.CreateFunction("exp", {2, 1}), std::logic_error);
+    ASSERT_THROW(fact.CreateFunction("constant", {2, 1}), std::logic_error);
+    ASSERT_THROW(fact.CreateFunction("ident", {1, 2, 1}), std::logic_error);
+    ASSERT_THROW(fact.CreateFunction("ident", {1}), std::logic_error);
+    ASSERT_THROW(fact.CreateFunction("power", {1, 2}), std::logic_error);
+}
 
+TEST(DerivativeTest, TestDerivationConstant) {
+    FunFactory fact;
+    std::vector<std::shared_ptr<TFunction>> functions;
+
+    std::vector<double> coefs{1, 2, 0.3, -2.3, -3, 0};
+    std::vector<double> points{1, 3, 0, -1, 3};
+
+    for (auto coef : coefs) {
+        functions.push_back(fact.CreateFunction("constant", {coef}));
+    }
+
+    for (int i = 0; i < functions.size(); i++) {
+        ASSERT_NEAR(coefs[i], functions[i]->GetDeriv(points[i]), 0.001);
+    }
+}
+
+TEST(DerivativeTest, TestDerivationPower) {
+    FunFactory fact;
+    std::vector<std::shared_ptr<TFunction>> functions;
+
+    std::vector<double> coefs{1, 2, 0.3};
+    std::vector<double> points{1, 3, 0.4};
+
+    for (auto coef : coefs) {
+        functions.push_back(fact.CreateFunction("power", {coef}));
+    }
+
+    for (int i = 0; i < functions.size(); i++) {
+        for (auto point : points) {
+            ASSERT_NEAR(
+                    coefs[i] * std::pow(point, coefs[i] - 1), 
+                    functions[i]->GetDeriv(point), 0.001);
+        }
+    }
+}
+
+TEST(DerivativeTest, TestDerivationExponent) {
+    FunFactory fact;
+    std::vector<std::shared_ptr<TFunction>> functions;
+
+    std::vector<double> coefs{1, 2, 0.3};
+    std::vector<double> points{1, 3, 0.4};
+
+    for (auto coef : coefs) {
+        functions.push_back(fact.CreateFunction("exp", {coef}));
+    }
+
+    for (int i = 0; i < functions.size(); i++) {
+        for (auto point : points) {
+            ASSERT_NEAR(
+                    std::log(coefs[i]) * std::pow(coefs[i], point), 
+                    functions[i]->GetDeriv(point), 0.001);
+        }
+    }
+}
+
+TEST(DerivativeTest, TestDerivationIdentical) {
+    FunFactory fact;
+    std::vector<std::shared_ptr<TFunction>> functions;
+
+    std::vector<double> coefs{1, 4.2, -1, 2, 0.3, -0.6};
+    std::vector<double> points{1, 3, 0.4};
+
+    for (int i = 0; i < coefs.size(); i += 2) {
+        functions.push_back(fact.CreateFunction("ident", {coefs[i], coefs[i + 1]}));
+    }
+
+    for (int i = 0; i < functions.size(); i++) {
+        ASSERT_NEAR(coefs[i * 2], functions[i]->GetDeriv(points[i]), 0.001);
+    }
+}
+
+TEST(DerivativeTest, TestDerivationPolynomial) {
+    FunFactory fact;
+
+}
+
+    
 int main(int argc, char** argv) {
     testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();    
