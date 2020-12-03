@@ -7,12 +7,12 @@
 
 std::shared_ptr<TFunction> operator+(std::shared_ptr<TFunction> a, std::shared_ptr<TFunction> b);
 
-template<class Fun>
+template<typename Fun>
 std::shared_ptr<TFunction> operator+(std::shared_ptr<TFunction> a, Fun &b) {
     throw std::logic_error("OPERATOR +: bad operands");
 }
 
-template<class Fun>
+template<typename Fun>
 std::shared_ptr<TFunction> operator+(Fun &a, std::shared_ptr<TFunction> b) {
     throw std::logic_error("OPERATOR +: bad operands");
 }
