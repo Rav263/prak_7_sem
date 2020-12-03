@@ -1,8 +1,4 @@
-#include "operators.hpp"
-#include "math_lib.hpp"
-#include "factory.hpp"
-
-//#include "mathlibrary.hpp"
+#include "mathlibrary.hpp"
 #include <gtest/gtest.h>
 #include <typeinfo>
 #include <cmath>
@@ -348,10 +344,86 @@ TEST(DerivativeTest, TestDerivationIdentical) {
 
 TEST(DerivativeTest, TestDerivationPolynomial) {
     FunFactory fact;
+    
+    auto fun_1 = fact.CreateFunction("polynomial", {1, 0, 3, -2});
+    auto fun_2 = fact.CreateFunction("polynomial", {1.3, 2, 3.1});
+    auto fun_3 = fact.CreateFunction("polynomial", {0, 0, 0, -2.3});
+    auto fun_4 = fact.CreateFunction("polynomial", {1, 2.1});
 
+    std::vector<double> points{0, 2, 1, -1};
+    std::vector<double> results_1{0, -12,  0, -12};
+    std::vector<double> results_2{2, 14.4, 8.2, -4.2};
+    std::vector<double> results_3{0, -27.6, -6.9, -6.9};
+    std::vector<double> results_4{2.1, 2.1, 2.1, 2.1};
+
+    for (int i = 0; i < points.size(); i++) {
+        ASSERT_NEAR(results_1[i], fun_1->GetDeriv(points[i]), 0.001);
+    }
+    for (int i = 0; i < points.size(); i++) {
+        ASSERT_NEAR(results_2[i], fun_2->GetDeriv(points[i]), 0.001);
+    }
+    for (int i = 0; i < points.size(); i++) {
+        ASSERT_NEAR(results_3[i], fun_3->GetDeriv(points[i]), 0.001);
+    }
+    for (int i = 0; i < points.size(); i++) {
+        ASSERT_NEAR(results_4[i], fun_4->GetDeriv(points[i]), 0.001);
+    }
 }
 
-    
+TEST(GradientDescentTest, TestIdentFunction) {
+    FunFactory fact;
+
+    auto fun_1 = fact.CreateFunction("ident", {1, 3});
+    auto fun_2 = fact.CreateFunction("ident", {2, -2});
+    auto fun_3 = fact.CreateFunction("ident", {1, 0});
+
+    std::vector<uint64_t> iterations{10000, 100000, 1000000};
+    for (auto iter : iterations) {
+        ASSERT_NEAR(-3, GradientDescent(fun_1, iter, 0), 1.0 / iter);
+    }
+    for (auto iter : iterations) {
+        ASSERT_NEAR(1, GradientDescent(fun_2, iter, 0), 1.0 / iter);
+    }
+    for (auto iter : iterations) {
+        ASSERT_NEAR(0, GradientDescent(fun_3, iter, 5), 1.0 / iter);
+    }
+}
+
+TEST(GradientDescentTest, TestPowerFunction) {
+    FunFactory fact;
+
+    auto fun_1 = fact.CreateFunction("power", {1});
+
+    std::vector<uint64_t> iterations{10000, 100000, 1000000};
+    for (auto iter : iterations) {
+        ASSERT_NEAR(0, GradientDescent(fun_1, iter, 3), 10.0 / iter);
+    }
+}
+
+TEST(GradientDescentTest, TestPolynomialFunction) {
+    FunFactory fact;
+
+    auto fun_1 = fact.CreateFunction("polynomial", {0, -2, 2});
+    auto fun_2 = fact.CreateFunction("polynomial", {2, 2, -1});
+    auto fun_3 = fact.CreateFunction("polynomial", {1, -4, 4});
+
+    std::vector<uint64_t> iterations{10000, 100000, 1000000};
+    for (auto iter : iterations) {
+        ASSERT_NEAR(-0.7320508, GradientDescent(fun_2, iter, -1.5), 10000.0 / iter);
+    }
+    for (auto iter : iterations) {
+        ASSERT_NEAR(2.7320508, GradientDescent(fun_2, iter, 3), 10000.0 / iter);
+    }
+    for (auto iter : iterations) {
+        ASSERT_NEAR(0, GradientDescent(fun_1, iter, -2), 10000.0 / iter);
+    }
+    for (auto iter : iterations) {
+        ASSERT_NEAR(1, GradientDescent(fun_1, iter, 2), 10000.0 / iter);
+    }
+    for (auto iter : iterations) {
+        ASSERT_NEAR(0.5, GradientDescent(fun_3, iter, 3), 10000.0 / iter);
+    }
+}   
 int main(int argc, char** argv) {
     testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();    
