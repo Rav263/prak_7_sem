@@ -22,14 +22,6 @@ int main() {
     auto p = f  + g;
 
     std::cout << p->GetDeriv(1) << " " << f->GetDeriv(3) << std::endl;
-    //std::cout << GradientDescent(p, 100000, 3) << std::endl;
-    //auto fuck_you = "wedw" + f;
     std::cout << (*p)(10) << std::endl;
     auto fun_2 = fact.CreateFunction("polynomial", {0, 1, -2.3});
-    if (fun_2 == nullptr) {
-        std::cout << "WHAT THE FUCK" << std::endl;
-    } else {
-        std::string now =  fun_2->ToString();
-        std::cout << now << std::endl;
-    }
 }
