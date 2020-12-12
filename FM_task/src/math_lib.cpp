@@ -2,7 +2,7 @@
 #include <iomanip>
 #include <sstream>
 #include "math_lib.hpp"
-
+#include <iostream>
 
 CompFunction::CompFunction(std::vector<std::shared_ptr<TFunction>> functions, std::string name) {
     this->functions = functions;
@@ -22,8 +22,7 @@ double CompFunction::GetDeriv(double point) {
         return result;
     }
     if (this->operator_name == "-") {
-        for (auto now : derivs) result -= now;
-        return result;
+        return derivs[0] - derivs[1];
     }
 
     std::vector<double> results;
@@ -242,6 +241,4 @@ double Polynomial::GetDeriv(double point) {
         result += coefs[i] * std::pow(point, i - 1) * i;
     }
     return result;
-
-
 }
