@@ -1,5 +1,6 @@
 #include "configuration.hpp"
 #include <iostream>
+#include <fstream>
 #include <cstdlib>
 #include <sstream>
 
@@ -28,6 +29,16 @@ void print_scroll_field(ConfigPtr config) {
             else std::cout << "- ";
         }
         std::cout << std::endl;
+    }
+}
+void print_to_file(ConfigPtr config, std::string file_name) {
+    std::ofstream out(file_name);
+    for (int y = 0; y < FIELD_SIDE; y++) {
+        for (int x = 0; x < FIELD_SIDE; x++) {
+            if ((*config)[get_index(x, y)]) out << "X ";
+            else out << "- ";
+        }
+        out << std::endl;
     }
 }
 

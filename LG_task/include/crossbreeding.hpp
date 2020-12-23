@@ -5,9 +5,15 @@
 #include <memory>
 
 class AbstractCrossbreeding {
+public:
+    virtual void crossbreed(std::vector<ConfigPtr> &population) = 0;
 };
 
 class Crossbreeding : public AbstractCrossbreeding {
+double p_cross = 0.8;
+uint32_t npop = 100;
+public:
+    void crossbreed(std::vector<ConfigPtr> &population);
 };
 
 
